@@ -51,7 +51,11 @@ st.title("💻 J.A.R.V.I.S. AI System")
 MODEL_NAME = "gemini-2.5-flash"
 
 # Initialize the model
-model = genai.GenerativeModel(MODEL_NAME)
+# FIX: Attempting to enable Google Search by passing 'tools' to the model constructor
+model = genai.GenerativeModel(
+    MODEL_NAME,
+    tools=[{"googleSearch": {}}] 
+)
 
 # --- NEW FUNCTION FOR HISTORY SIDEBAR ---
 def show_history_sidebar():
@@ -142,8 +146,8 @@ if user_input:
                      {"role": role, "parts": [{"text": msg["text"]}]}
                  )
             
-            # Call generate_content with history (memory)
-            # FIX: Removed the incompatible 'config' parameter to prevent crashing.
+            # Call generate_content with history (memory). 
+            # Tools are now configured in the GenerativeModel constructor.
             response = model.generate_content(
                 contents
             ) 
