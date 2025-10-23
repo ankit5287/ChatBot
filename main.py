@@ -7,7 +7,7 @@ import google.generativeai as genai
 try:
     load_dotenv()
 except ImportError:
-    pass
+    pass # Ignore if python-dotenv is not installed in deployment
 
 # Configure API key
 api_key = os.getenv("GOOGLE_API_KEY") or st.secrets.get("GOOGLE_API_KEY")
@@ -18,6 +18,7 @@ if not api_key:
     
 genai.configure(api_key=api_key)
 
+
 # Streamlit page settings
 st.set_page_config(
     page_title="Generative AI Chatbot",
@@ -25,10 +26,12 @@ st.set_page_config(
     layout="centered",
 )
 
-st.title("🤖 Generative AI Chatbot (with Memory and Search)")
+st.title("🤖 Generative AI Chatbot")
 
-# Choose Gemini model
+# Choose Gemini model (gemini-2.5-flash is the current stable name)
 MODEL_NAME = "gemini-2.5-flash"
+
+# Initialize the model
 model = genai.GenerativeModel(MODEL_NAME)
 
 # Chat history stored in session state
@@ -44,36 +47,21 @@ for msg in st.session_state.messages:
 user_input = st.chat_input("Type your message...")
 
 if user_input:
-    # 1. Display and save user message to history
+    # Display user message
     st.chat_message("user").markdown(user_input)
     st.session_state.messages.append({"role": "user", "text": user_input})
 
     try:
-        # 2. Format the entire conversation history for the API (for memory)
-        contents = []
-        for msg in st.session_state.messages:
-             # Map Streamlit role 'assistant' to API role 'model'
-             role = "user" if msg["role"] == "user" else "model" 
-             contents.append(genai.types.Content(
-                 role=role,
-                 parts=[genai.types.Part.from_text(msg["text"])]
-             ))
+        # Generate response from Gemini (this call does NOT maintain context/memory across turns)
+        response = model.generate_content(user_input)
 
-        # 3. Generate response with full history (memory) AND Google Search (real-time data)
-        response = model.generate_content(
-            contents,
-            tools=[{"google_search": {}}] # <--- This enables Grounding/Search
-        )
-
-        # 4. Display AI response
+        # Display AI response
         ai_text = response.text
         with st.chat_message("assistant"):
             st.markdown(ai_text)
 
-        # 5. Save AI response in session
+        # Save AI response in session
         st.session_state.messages.append({"role": "assistant", "text": ai_text})
 
     except Exception as e:
         st.error(f"Error: {e}")
-
-
