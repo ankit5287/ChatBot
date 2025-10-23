@@ -3,12 +3,18 @@ import streamlit as st
 from dotenv import load_dotenv
 import google.generativeai as genai
 
+# --- CONFIGURATION CONSTANTS ---
+
 # Define creator details as constants
 CREATOR_NAME = "Ankit Nandoliya"
 CREATOR_PORTFOLIO = "https://ankit52-git-main-ankitnandoliya32-8971s-projects.vercel.app/"
-CREATOR_KEYWORDS = ["who built you", "who made you", "your creator", "your developer", "who created you", "who is ankit", "tell me about ankit", "who is my master", "tell me about yourself"]
+CREATOR_KEYWORDS = [
+    "who built you", "who made you", "your creator", 
+    "your developer", "who created you", "who is ankit", 
+    "tell me about ankit", "who is my master", "tell me about yourself"
+]
 
-# --- ADDED DETAILED PROFILE HISTORY (Simplified) ---
+# Detailed profile for the custom response
 CREATOR_PROFILE = """
 **Ankit Nandoliya** is a software developer focused on full-stack development and artificial intelligence integration. He creates smooth user experiences and stable, scalable backend systems.
 
@@ -19,7 +25,12 @@ CREATOR_PROFILE = """
 
 He approaches projects with a focus on problem-solving and attention to detail.
 """
-# --- END ADDED DETAILED PROFILE HISTORY ---
+
+# Use a tool-capable model for real-time information
+MODEL_NAME = "gemini-1.5-pro-latest" 
+
+
+# --- API KEY & MODEL INITIALIZATION ---
 
 # Load environment variables from .env
 try:
@@ -27,7 +38,7 @@ try:
 except ImportError:
     pass # Ignore if python-dotenv is not installed in deployment
 
-# Configure API key
+# Configure API key (from environment variable or Streamlit Secrets)
 api_key = os.getenv("GOOGLE_API_KEY") or st.secrets.get("GOOGLE_API_KEY")
 
 if not api_key:
@@ -36,6 +47,19 @@ if not api_key:
     
 genai.configure(api_key=api_key)
 
+# Initialize the model with the Google Search tool enabled
+# THIS IS THE KEY FIX FOR REAL-TIME INFORMATION
+try:
+    model = genai.GenerativeModel(
+        MODEL_NAME,
+        tools=["google_search"] 
+    )
+except ValueError as e:
+     st.error(f"Initialization Error: {e}. Please ensure your 'google-generativeai' library is version >= 0.5.0 in your requirements.txt.")
+     st.stop()
+
+
+# --- STREAMLIT APP SETUP ---
 
 # Streamlit page settings
 st.set_page_config(
@@ -44,18 +68,7 @@ st.set_page_config(
     layout="centered",
 )
 
-
 st.title("💻 J.A.R.V.I.S. AI System")
-
-# Choose Gemini model (use a current, tool-capable model)
-MODEL_NAME = "gemini-1.5-pro-latest" 
-
-# Initialize the model
-# This line is CORRECT and will work after you update requirements.txt
-model = genai.GenerativeModel(
-    MODEL_NAME,
-    tools=["google_search"]  
-)
 
 # Chat history stored in session state
 if "messages" not in st.session_state:
@@ -63,7 +76,7 @@ if "messages" not in st.session_state:
     # INITIAL GREETING MESSAGE
     st.session_state.messages.append({
         "role": "assistant",
-        "text": "Hi I am Jarvis"
+        "text": "Greetings, I am J.A.R.V.I.S. How may I assist you today?"
     })
 
 # Display past messages
@@ -107,7 +120,6 @@ if user_input:
                 )
             
             # Call generate_content with history (memory)
-            # This call will now automatically use Google Search when needed
             response = model.generate_content(contents) 
             ai_text = response.text
 
