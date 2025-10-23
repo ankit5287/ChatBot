@@ -2,16 +2,11 @@ import os
 import streamlit as st
 from dotenv import load_dotenv
 import google.generativeai as genai
-import datetime # 1. Import datetime module
 
 # Define creator details as constants
 CREATOR_NAME = "Ankit Nandoliya"
 CREATOR_PORTFOLIO = "https://ankit52-git-main-ankitnandoliya32-8971s-projects.vercel.app/"
-CREATOR_KEYWORDS = [
-    "who built you", "who made you", "your creator", "your developer", 
-    "who created you", "who is ankit", "tell me about ankit", "who is my master", 
-    "tell me about yourself", "what is your name", "your name", "who are you",
-]
+CREATOR_KEYWORDS = ["who built you", "who made you", "your creator", "your developer", "who created you", "who is ankit", "tell me about ankit", "who is my master", "tell me about yourself"]
 
 # --- ADDED DETAILED PROFILE HISTORY (Simplified) ---
 CREATOR_PROFILE = """
@@ -41,16 +36,6 @@ if not api_key:
     
 genai.configure(api_key=api_key)
 
-# --- MOVED: Chat history stored in session state is now initialized early ---
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-    # INITIAL GREETING MESSAGE
-    st.session_state.messages.append({
-        "role": "assistant",
-        "text": "Hi I am Jarvis"
-    })
-# --- END MOVED BLOCK ---
-
 
 # Streamlit page settings
 st.set_page_config(
@@ -66,50 +51,16 @@ st.title("💻 J.A.R.V.I.S. AI System")
 MODEL_NAME = "gemini-2.5-flash"
 
 # Initialize the model
-# FIX: Removing incompatible 'tools' parameter from constructor to stop the ValueError.
-model = genai.GenerativeModel(
-    MODEL_NAME
-)
+model = genai.GenerativeModel(MODEL_NAME)
 
-# --- NEW FUNCTION FOR HISTORY SIDEBAR ---
-def show_history_sidebar():
-    """Displays user's question history in the Streamlit sidebar."""
-    st.sidebar.title("💬 Conversation History")
-    
-    # Filter for user messages and reverse to show most recent first
-    # FIX: Use .get() and check for the 'text' key to prevent AttributeErrors from malformed messages
-    user_queries = [
-        msg['text'] for msg in st.session_state.messages 
-        if msg.get('role') == 'user' and msg.get('text') is not None
-    ][::-1] 
-
-    if user_queries:
-        # Add a clear history button at the top of the sidebar history list
-        if st.sidebar.button("🗑️ Clear Chat History"):
-            st.session_state.messages = [{
-                "role": "assistant",
-                "text": "Hi I am Jarvis"
-            }]
-            # FIX: Replace deprecated st.experimental_rerun() with st.rerun()
-            st.rerun()
-            
-        st.sidebar.markdown("---")
-        
-        # Display each query
-        st.sidebar.markdown("**Recent Questions:**")
-        for i, query in enumerate(user_queries):
-            # Truncate for cleaner display
-            display_text = query[:45] + ('...' if len(query) > 45 else '')
-            # Display as a simple markdown list item
-            st.sidebar.markdown(f"**-** *{display_text}*")
-            
-    else:
-        st.sidebar.info("Start a conversation to see your recent questions here.")
-# --- END NEW FUNCTION ---
-
-# CALL THE NEW SIDEBAR FUNCTION HERE
-show_history_sidebar()
-
+# Chat history stored in session state
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+    # INITIAL GREETING MESSAGE
+    st.session_state.messages.append({
+        "role": "assistant",
+        "text": "Hi I am Jarvis"
+    })
 
 # Display past messages
 for msg in st.session_state.messages:
@@ -127,9 +78,8 @@ if user_input:
     ai_text = ""
     
     # 1. Custom Question Handling (Bypass API)
-    lower_input = user_input.lower()
-    is_creator_query = any(keyword in lower_input for keyword in CREATOR_KEYWORDS)
-    is_date_query = any(keyword in lower_input for keyword in ["todays date", "what is the date", "current date", "what day is it", "today's date"])
+    # This logic ensures that if a creator keyword is found, the API is bypassed, preventing any Google search.
+    is_creator_query = any(keyword in user_input.lower() for keyword in CREATOR_KEYWORDS)
 
     if is_creator_query:
         # Hardcoded response for creator identity
@@ -139,9 +89,6 @@ if user_input:
             f"{CREATOR_PROFILE}"
             f"\n\nFor more details on his projects and technical background, please visit his portfolio here: **[{CREATOR_PORTFOLIO}]({CREATOR_PORTFOLIO})**"
         )
-    elif is_date_query: # Check for date query
-        current_date = datetime.date.today().strftime("%A, %B %d, %Y")
-        ai_text = f"The current system date is **{current_date}**."
     else:
         # 2. Normal Gemini API Call (if not a custom question)
         try:
@@ -156,10 +103,8 @@ if user_input:
                      {"role": role, "parts": [{"text": msg["text"]}]}
                  )
             
-            # Call generate_content with history (memory). 
-            response = model.generate_content(
-                contents
-            ) 
+            # Call generate_content with history (memory)
+            response = model.generate_content(contents) 
             ai_text = response.text
 
         except Exception as e:
