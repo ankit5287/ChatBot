@@ -6,7 +6,7 @@ import google.generativeai as genai
 # Define creator details as constants
 CREATOR_NAME = "Ankit Nandoliya"
 CREATOR_PORTFOLIO = "https://ankit52-git-main-ankitnandoliya32-8971s-projects.vercel.app/"
-CREATOR_KEYWORDS = ["who built you", "who made you", "your creator", "your developer", "who created you", "who is ankit", "what is your name", "your name", "who are you"]
+CREATOR_KEYWORDS = ["who built you", "who made you", "your creator", "your developer", "who created you", "who is ankit", "tell me about ankit", "who is my master", "tell me about yourself"]
 
 # --- ADDED DETAILED PROFILE HISTORY (Simplified) ---
 CREATOR_PROFILE = """
@@ -44,47 +44,8 @@ st.set_page_config(
     layout="centered",
 )
 
-# --- NEW FUNCTION FOR HISTORY SIDEBAR ---
-def show_history_sidebar():
-    """Displays user's question history in the Streamlit sidebar."""
-    st.sidebar.title("💬 Conversation History")
-    
-    # Filter for user messages and reverse to show most recent first
-    # FIX: Use .get() and check for the 'text' key to prevent AttributeErrors from malformed messages
-    user_queries = [
-        msg['text'] for msg in st.session_state.messages 
-        if msg.get('role') == 'user' and msg.get('text') is not None
-    ][::-1] 
-
-    if user_queries:
-        # Add a clear history button at the top of the sidebar history list
-        if st.sidebar.button("🗑️ Clear Chat History"):
-            st.session_state.messages = [{
-                "role": "assistant",
-                "text": "Hi I am Jarvis"
-            }]
-            # FIX: Replace deprecated st.experimental_rerun() with st.rerun()
-            st.rerun()
-            
-        st.sidebar.markdown("---")
-        
-        # Display each query
-        st.sidebar.markdown("**Recent Questions:**")
-        for i, query in enumerate(user_queries):
-            # Truncate for cleaner display
-            display_text = query[:45] + ('...' if len(query) > 45 else '')
-            # Display as a simple markdown list item
-            st.sidebar.markdown(f"**-** *{display_text}*")
-            
-    else:
-        st.sidebar.info("Start a conversation to see your recent questions here.")
-# --- END NEW FUNCTION ---
-
 
 st.title("💻 J.A.R.V.I.S. AI System")
-
-# CALL THE NEW SIDEBAR FUNCTION HERE
-show_history_sidebar()
 
 # Choose Gemini model (gemini-2.5-flash is the current stable name)
 MODEL_NAME = "gemini-2.5-flash"
@@ -117,6 +78,7 @@ if user_input:
     ai_text = ""
     
     # 1. Custom Question Handling (Bypass API)
+    # This logic ensures that if a creator keyword is found, the API is bypassed, preventing any Google search.
     is_creator_query = any(keyword in user_input.lower() for keyword in CREATOR_KEYWORDS)
 
     if is_creator_query:
