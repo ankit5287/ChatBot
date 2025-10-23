@@ -53,6 +53,45 @@ MODEL_NAME = "gemini-2.5-flash"
 # Initialize the model
 model = genai.GenerativeModel(MODEL_NAME)
 
+# --- NEW FUNCTION FOR HISTORY SIDEBAR ---
+def show_history_sidebar():
+    """Displays user's question history in the Streamlit sidebar."""
+    st.sidebar.title("💬 Conversation History")
+    
+    # Filter for user messages and reverse to show most recent first
+    # FIX: Use .get() and check for the 'text' key to prevent AttributeErrors from malformed messages
+    user_queries = [
+        msg['text'] for msg in st.session_state.messages 
+        if msg.get('role') == 'user' and msg.get('text') is not None
+    ][::-1] 
+
+    if user_queries:
+        # Add a clear history button at the top of the sidebar history list
+        if st.sidebar.button("🗑️ Clear Chat History"):
+            st.session_state.messages = [{
+                "role": "assistant",
+                "text": "Hi I am Jarvis"
+            }]
+            # FIX: Replace deprecated st.experimental_rerun() with st.rerun()
+            st.rerun()
+            
+        st.sidebar.markdown("---")
+        
+        # Display each query
+        st.sidebar.markdown("**Recent Questions:**")
+        for i, query in enumerate(user_queries):
+            # Truncate for cleaner display
+            display_text = query[:45] + ('...' if len(query) > 45 else '')
+            # Display as a simple markdown list item
+            st.sidebar.markdown(f"**-** *{display_text}*")
+            
+    else:
+        st.sidebar.info("Start a conversation to see your recent questions here.")
+# --- END NEW FUNCTION ---
+
+# CALL THE NEW SIDEBAR FUNCTION HERE
+show_history_sidebar()
+
 # Chat history stored in session state
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -104,7 +143,7 @@ if user_input:
                  )
             
             # Call generate_content with history (memory)
-            # FIX: REMOVED the incompatible tools parameter to prevent crashing.
+            # NOTE: Search grounding is disabled to prevent crashing due to incompatible library version.
             response = model.generate_content(
                 contents
             ) 
