@@ -6,7 +6,7 @@ import google.generativeai as genai
 # Define creator details as constants
 CREATOR_NAME = "Ankit Nandoliya"
 CREATOR_PORTFOLIO = "https://ankit52-git-main-ankitnandoliya32-8971s-projects.vercel.app/"
-CREATOR_KEYWORDS = ["who built you", "who made you", "your creator", "your developer", "who created you", "who is ankit", "tell me about ankit", "who is my master"]
+CREATOR_KEYWORDS = ["who built you", "who made you", "your creator", "your developer", "who created you", "who is ankit", "tell me about ankit", "who is my master", "tell me about yourself"]
 
 # --- ADDED DETAILED PROFILE HISTORY (Simplified) ---
 CREATOR_PROFILE = """
@@ -40,12 +40,12 @@ genai.configure(api_key=api_key)
 # Streamlit page settings
 st.set_page_config(
     page_title="J.A.R.V.I.S.",
-    page_icon="",
+    page_icon="💻",
     layout="centered",
 )
 
 
-st.title("J.A.R.V.I.S")
+st.title("💻 J.A.R.V.I.S. AI System")
 
 # Choose Gemini model (gemini-2.5-flash is the current stable name)
 MODEL_NAME = "gemini-2.5-flash"
@@ -78,6 +78,7 @@ if user_input:
     ai_text = ""
     
     # 1. Custom Question Handling (Bypass API)
+    # Check if any keyword matches the user input
     is_creator_query = any(keyword in user_input.lower() for keyword in CREATOR_KEYWORDS)
 
     if is_creator_query:
