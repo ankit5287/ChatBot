@@ -29,7 +29,7 @@ st.set_page_config(
 st.title("🤖 Generative AI Chatbot")
 
 # Choose Gemini model (gemini-2.5-flash is the current stable name)
-MODEL_NAME = "gemini-2.5-flash"
+MODEL_NAME = "gemini-1.5-flash"
 
 # Initialize the model
 model = genai.GenerativeModel(MODEL_NAME)
