@@ -45,7 +45,7 @@ st.set_page_config(
 )
 
 
-st.title("🤖 J.A.R.V.I.S. AI System")
+st.title("🤖 J.A.R.V.I.S")
 
 # Choose Gemini model (gemini-2.5-flash is the current stable name)
 MODEL_NAME = "gemini-2.5-flash"
