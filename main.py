@@ -20,13 +20,60 @@ genai.configure(api_key=api_key)
 
 
 # Streamlit page settings
+# CHANGE: Set layout to wide for better use of screen space
 st.set_page_config(
-    page_title="Generative AI Chatbot",
-    page_icon="🤖",
-    layout="centered",
+    page_title="J.A.R.V.I.S.", # RENAME PAGE TITLE
+    page_icon="💻", # CHANGED ICON TO A MORE SUITABLE ONE
+    layout="wide",
 )
 
-st.title("🤖 Generative AI Chatbot")
+# --- START UI CUSTOMIZATION ---
+custom_css = """
+<style>
+/* 1. Primary Container Styling */
+.stApp {
+    background-color: #f0f2f6; /* Light gray background */
+}
+
+/* 2. Main Content Block Styling (making it look like a floating card) */
+.main .block-container {
+    padding-top: 2rem;
+    padding-right: 1rem;
+    padding-left: 1rem;
+    padding-bottom: 2rem;
+    max-width: 1200px; /* Max width for wide layout */
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Subtle shadow */
+    margin: 0 auto;
+}
+
+/* 3. Title Styling */
+h1 {
+    color: #1f77b4; /* Streamlit blue color for title */
+    border-bottom: 2px solid #1f77b4;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* 4. Chat Input Styling */
+.stTextInput > div > div > input {
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+/* 5. Chat Bubble Styling (optional, often better to leave default for simplicity) */
+/* This is harder to control with the current Streamlit API, sticking to simple changes */
+
+</style>
+"""
+# Inject the custom CSS
+st.markdown(custom_css, unsafe_allow_html=True)
+# --- END UI CUSTOMIZATION ---
+
+
+st.title("💻 J.A.R.V.I.S. AI System") # RENAME MAIN TITLE
 
 # Choose Gemini model (gemini-2.5-flash is the current stable name)
 MODEL_NAME = "gemini-2.5-flash"
@@ -37,6 +84,11 @@ model = genai.GenerativeModel(MODEL_NAME)
 # Chat history stored in session state
 if "messages" not in st.session_state:
     st.session_state.messages = []
+    # ADDED INITIAL GREETING MESSAGE HERE
+    st.session_state.messages.append({
+        "role": "assistant",
+        "text": "Hi, I am Jarvis."
+    })
 
 # Display past messages
 for msg in st.session_state.messages:
