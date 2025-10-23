@@ -54,23 +54,35 @@ def show_auth_screen():
     # Use tabs for a cleaner Login/Sign Up interface
     if 'login_tab' not in st.session_state:
         st.session_state.login_tab = "Login"
-        
-    login_tab, signup_tab = st.tabs(["🔒 Login", "✍️ Sign Up"])
     
-    # Check which tab to activate
-    active_tab = login_tab if st.session_state.login_tab == "Login" else signup_tab
+    # Define tab names explicitly
+    LOGIN_TAB_NAME = "🔒 Login"
+    SIGNUP_TAB_NAME = "✍️ Sign Up"
+        
+    login_tab, signup_tab = st.tabs([LOGIN_TAB_NAME, SIGNUP_TAB_NAME])
+    
+    # Determine the currently active tab label
+    if st.session_state.login_tab == "Login":
+        active_tab = login_tab
+        active_tab_label = LOGIN_TAB_NAME
+    else:
+        active_tab = signup_tab
+        active_tab_label = SIGNUP_TAB_NAME
+
 
     with active_tab:
         
-        st.subheader(f"{active_tab.title.replace('🔒 ', '').replace('✍️ ', '')}")
+        # FIX: Extract the subheader text from the known label string
+        subheader_text = active_tab_label.replace('🔒 ', '').replace('✍️ ', '')
+        st.subheader(subheader_text)
         
-        with st.form(key=f'{active_tab.title.replace(" ", "_").lower()}_form'):
+        with st.form(key=f'{subheader_text.replace(" ", "_").lower()}_form'):
             user = st.text_input("Username")
             password = st.text_input("Password", type="password")
-            submitted = st.form_submit_button(f"{active_tab.title.replace('🔒 ', '').replace('✍️ ', '')} Now")
+            submitted = st.form_submit_button(f"{subheader_text} Now")
 
             if submitted:
-                if active_tab.title == "🔒 Login":
+                if subheader_text == "Login":
                     handle_login(user, password)
                 else:
                     handle_signup(user, password)
@@ -80,7 +92,7 @@ def show_auth_screen():
                         st.experimental_rerun() # Rerun to switch tab
                         
         # Allow switching tabs by state
-        if active_tab.title == "🔒 Login":
+        if active_tab_label == LOGIN_TAB_NAME:
             st.session_state.login_tab = "Login"
         else:
             st.session_state.login_tab = "Sign Up"
@@ -193,4 +205,3 @@ if st.session_state.logged_in:
 else:
     # Show authentication screen
     show_auth_screen()
-
