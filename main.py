@@ -142,13 +142,10 @@ if user_input:
                      {"role": role, "parts": [{"text": msg["text"]}]}
                  )
             
-            # FIX: Use the 'config' parameter with a known-to-be-compatible structure
-            # This is the last remaining way to force search grounding past the SDK errors.
+            # Call generate_content with history (memory)
+            # FIX: Removed the incompatible 'config' parameter to prevent crashing.
             response = model.generate_content(
-                contents,
-                config={
-                    "tools": [{"googleSearch": {}}] 
-                }
+                contents
             ) 
             ai_text = response.text
 
