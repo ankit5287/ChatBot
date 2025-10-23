@@ -6,11 +6,15 @@ import google.generativeai as genai
 # Define creator details as constants
 CREATOR_NAME = "Ankit Nandoliya"
 CREATOR_PORTFOLIO = "https://ankit52-git-main-ankitnandoliya32-8971s-projects.vercel.app/"
-CREATOR_KEYWORDS = ["who built you", "who made you", "your creator", "your developer", "who created you", "who is ankit", "tell me about ankit"]
+CREATOR_KEYWORDS = ["who built you", "who made you", "your creator", "your developer", "who created you", "who is ankit", "tell me about ankit", "who is my master", "tell me about yourself"]
 
-# --- ADDED DETAILED PROFILE HISTORY (Simplified) ---
+# --- ADDED SIMPLE JARVIS INTRODUCTION ---
+JARVIS_INTRODUCTION = "I am J.A.R.V.I.S., a digital AI assistant designed to manage information and handle complex queries. I am here to serve as your digital interface."
+# --- END ADDED SIMPLE JARVIS INTRODUCTION ---
+
+# --- CREATOR PROFILE HISTORY (Still defined, but NOT used in the simplified response) ---
 CREATOR_PROFILE = """
-**Ankit Nandoliya** is a software developer focused on full-stack development and artificial intelligence integration. He creates smooth user experiences and stable, scalable backend systems.
+The creator of this system is **Ankit Nandoliya**. He is a software developer focused on full-stack development and artificial intelligence integration. He creates smooth user experiences and stable, scalable backend systems.
 
 **Key Expertise:**
 * **Full Stack Development:** Experienced with modern JavaScript frameworks (like React or Angular) and Python/Node.js for backend services.
@@ -19,7 +23,7 @@ CREATOR_PROFILE = """
 
 He approaches projects with a focus on problem-solving and attention to detail.
 """
-# --- END ADDED DETAILED PROFILE HISTORY ---
+# --- END CREATOR PROFILE HISTORY ---
 
 # Load environment variables from .env
 try:
@@ -83,13 +87,11 @@ if user_input:
     is_creator_query = any(keyword in user_input.lower() for keyword in CREATOR_KEYWORDS)
 
     if is_creator_query:
-        # Hardcoded response for creator identity
+        # --- SIMPLIFIED HARDCODED RESPONSE ---
         ai_text = (
-            f"I was built by the developer, **{CREATOR_NAME}**. "
-            f"\n\n--- **Creator Profile and History** ---\n\n"
-            f"{CREATOR_PROFILE}"
-            f"\n\nFor more details on his projects and technical background, please visit his portfolio here: **[{CREATOR_PORTFOLIO}]({CREATOR_PORTFOLIO})**"
+            f"I was built by **{CREATOR_NAME}**. {JARVIS_INTRODUCTION}"
         )
+        # --- END SIMPLIFIED HARDCODED RESPONSE ---
     else:
         # 2. Normal Gemini API Call (if not a custom question)
         try:
