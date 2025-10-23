@@ -6,7 +6,7 @@ import google.generativeai as genai
 # Define creator details as constants
 CREATOR_NAME = "Ankit Nandoliya"
 CREATOR_PORTFOLIO = "https://ankit52-git-main-ankitnandoliya32-8971s-projects.vercel.app/"
-CREATOR_KEYWORDS = ["who built you", "who made you", "your creator", "your developer", "who created you", "who is ankit"]
+CREATOR_KEYWORDS = ["who built you", "who made you", "your creator", "your developer", "who created you", "who is ankit", "what is your name", "your name", "who are you"]
 
 # --- ADDED DETAILED PROFILE HISTORY (Simplified) ---
 CREATOR_PROFILE = """
