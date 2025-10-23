@@ -142,10 +142,13 @@ if user_input:
                      {"role": role, "parts": [{"text": msg["text"]}]}
                  )
             
-            # Call generate_content with history (memory)
-            # NOTE: Search grounding is disabled to prevent crashing due to incompatible library version.
+            # FIX: Use the 'config' parameter with a known-to-be-compatible structure
+            # This is the last remaining way to force search grounding past the SDK errors.
             response = model.generate_content(
-                contents
+                contents,
+                config={
+                    "tools": [{"googleSearch": {}}] 
+                }
             ) 
             ai_text = response.text
 
