@@ -36,6 +36,16 @@ if not api_key:
     
 genai.configure(api_key=api_key)
 
+# --- MOVED: Chat history stored in session state is now initialized early ---
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+    # INITIAL GREETING MESSAGE
+    st.session_state.messages.append({
+        "role": "assistant",
+        "text": "Hi I am Jarvis"
+    })
+# --- END MOVED BLOCK ---
+
 
 # Streamlit page settings
 st.set_page_config(
@@ -95,14 +105,6 @@ def show_history_sidebar():
 # CALL THE NEW SIDEBAR FUNCTION HERE
 show_history_sidebar()
 
-# Chat history stored in session state
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-    # INITIAL GREETING MESSAGE
-    st.session_state.messages.append({
-        "role": "assistant",
-        "text": "Hi I am Jarvis"
-    })
 
 # Display past messages
 for msg in st.session_state.messages:
@@ -146,7 +148,6 @@ if user_input:
                  )
             
             # Call generate_content with history (memory). 
-            # Tools are now configured in the GenerativeModel constructor.
             response = model.generate_content(
                 contents
             ) 
