@@ -52,8 +52,24 @@ if user_input:
     st.session_state.messages.append({"role": "user", "text": user_input})
 
     try:
-        # Generate response from Gemini (this call does NOT maintain context/memory across turns)
-        response = model.generate_content(user_input)
+        # --- FIX: Start of Memory Implementation ---
+        
+        # 1. Format the entire conversation history (including the current turn) for the API
+        contents = []
+        for msg in st.session_state.messages:
+             # The API expects role 'model' for the assistant's responses
+             role = "user" if msg["role"] == "user" else "model" 
+             
+             # Use genai.types.Content and genai.types.Part to structure the message history
+             contents.append(genai.types.Content(
+                 role=role,
+                 parts=[genai.types.Part.from_text(msg["text"])]
+             ))
+
+        # 2. Generate response by passing the full 'contents' list (enabling memory)
+        response = model.generate_content(contents) 
+
+        # --- FIX: End of Memory Implementation ---
 
         # Display AI response
         ai_text = response.text
