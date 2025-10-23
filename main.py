@@ -30,7 +30,7 @@ st.set_page_config(
 # --- REMOVED UI CUSTOMIZATION BLOCK ---
 
 
-st.title("💻 J.A.R.V.I.S. AI System") # RENAME MAIN TITLE
+st.title("J.A.R.V.I.S") # RENAME MAIN TITLE
 # REMOVED JARVIS TAGLINE (st.subheader)
 
 # Choose Gemini model (gemini-2.5-flash is the current stable name)
