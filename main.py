@@ -51,10 +51,12 @@ st.title("💻 J.A.R.V.I.S. AI System")
 MODEL_NAME = "gemini-1.5-pro-latest" 
 
 # Initialize the model
+# This line is CORRECT and will work after you update requirements.txt
 model = genai.GenerativeModel(
     MODEL_NAME,
-    tools=["google_search"]  # <-- THIS IS THE FIX
+    tools=["google_search"]  
 )
+
 # Chat history stored in session state
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -80,7 +82,6 @@ if user_input:
     ai_text = ""
     
     # 1. Custom Question Handling (Bypass API)
-    # This logic ensures that if a creator keyword is found, the API is bypassed, preventing any Google search.
     is_creator_query = any(keyword in user_input.lower() for keyword in CREATOR_KEYWORDS)
 
     if is_creator_query:
@@ -97,15 +98,16 @@ if user_input:
             # Format the entire conversation history (for memory)
             contents = []
             for msg in st.session_state.messages:
-                 # The API expects role 'model' for the assistant's responses
-                 role = "user" if msg["role"] == "user" else "model" 
-                 
-                 # Using the dictionary list structure to avoid type errors
-                 contents.append(
-                     {"role": role, "parts": [{"text": msg["text"]}]}
-                 )
+                # The API expects role 'model' for the assistant's responses
+                role = "user" if msg["role"] == "user" else "model" 
+                
+                # Using the dictionary list structure to avoid type errors
+                contents.append(
+                    {"role": role, "parts": [{"text": msg["text"]}]}
+                )
             
             # Call generate_content with history (memory)
+            # This call will now automatically use Google Search when needed
             response = model.generate_content(contents) 
             ai_text = response.text
 
