@@ -84,10 +84,10 @@ model = genai.GenerativeModel(MODEL_NAME)
 # Chat history stored in session state
 if "messages" not in st.session_state:
     st.session_state.messages = []
-    # ADDED INITIAL GREETING MESSAGE HERE
+    # ADDED INITIAL GREETING MESSAGE HERE (REMOVED PERIOD)
     st.session_state.messages.append({
         "role": "assistant",
-        "text": "Hi, I am Jarvis."
+        "text": "Hi, I am Jarvis"
     })
 
 # Display past messages
