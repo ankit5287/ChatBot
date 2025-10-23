@@ -12,7 +12,6 @@ CREATOR_KEYWORDS = [
     "who created you", "who is ankit", "tell me about ankit", "who is my master", 
     "tell me about yourself", "what is your name", "your name", "who are you",
     # 2. Add date keywords
-    "todays date", "what is the date", "current date", "what day is it", "today's date"
 ]
 
 # --- ADDED DETAILED PROFILE HISTORY (Simplified) ---
