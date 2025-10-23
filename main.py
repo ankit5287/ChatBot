@@ -147,11 +147,10 @@ if user_input:
                      {"role": role, "parts": [{"text": msg["text"]}]}
                  )
             
-            # Call generate_content with history (memory) AND RE-ENABLE SEARCH
-            # FINAL ATTEMPT to use the simplest dictionary structure for Google Search grounding.
+            # Call generate_content with history (memory). 
+            # FIX: The tools parameter is now COMPLETELY removed for stability.
             response = model.generate_content(
-                contents,
-                tools=[{"googleSearch": {}}] # Using 'googleSearch' as a final attempt
+                contents
             ) 
             ai_text = response.text
 
