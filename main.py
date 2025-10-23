@@ -49,11 +49,11 @@ def show_history_sidebar():
     """Displays user's question history in the Streamlit sidebar."""
     st.sidebar.title("💬 Conversation History")
     
+    # FIX: Add conditional check for 'text' key to prevent AttributeError
     # Filter for user messages and reverse to show most recent first
-    # Skips the initial greeting message if present (by looking for 'user' role)
     user_queries = [
         msg['text'] for msg in st.session_state.messages 
-        if msg['role'] == 'user'
+        if msg.get('role') == 'user' and msg.get('text') is not None
     ][::-1] 
 
     if user_queries:
