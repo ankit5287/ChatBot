@@ -78,8 +78,12 @@ if user_input:
         # 2. Call generate_content with history (memory) and the Google Search tool (grounding)
         response = model.generate_content(
             contents,
-            # FIX: Capitalizing 'googleSearch' often resolves the 'Unknown field' error
-            tools=[{"googleSearch": {}}]
+            # FINAL FIX ATTEMPT for Search Grounding: Use the config dictionary structure
+            config={
+                "tools": [
+                    {"google_search": {}} # Using the snake_case name inside the config block
+                ]
+            }
         ) 
 
         # --- FIX: End of Memory Implementation ---
