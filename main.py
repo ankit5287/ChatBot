@@ -52,7 +52,7 @@ if user_input:
     st.session_state.messages.append({"role": "user", "text": user_input})
 
     try:
-        # --- FIX: Start of Memory Implementation ---
+        # --- FIX: Start of Memory and Streaming Implementation ---
         
         # 1. Format the entire conversation history (including the current turn) for the API
         contents = []
@@ -60,16 +60,24 @@ if user_input:
              # The API expects role 'model' for the assistant's responses
              role = "user" if msg["role"] == "user" else "model" 
              
-             # FIX: Using the dictionary list structure to avoid type errors
+             # Using the dictionary list structure to avoid type errors
              contents.append(
                  {"role": role, "parts": [{"text": msg["text"]}]}
              )
+        
+        # 2. FIX: Initialize a chat session with the full history
+        # This is the most stable way to handle stateful history and streaming.
+        # We exclude the final user message from the history passed here, as it will be 
+        # sent separately using send_message_stream.
+        history_for_chat = contents[:-1]
+        
+        # Start the chat session with prior history
+        chat = model.start_chat(history=history_for_chat)
 
+        # 3. FIX: Generate response using the reliable send_message_stream method
+        response_stream = chat.send_message_stream(user_input)
 
-        # 2. FIX: Generate response using STREAMING for better perceived performance
-        response_stream = model.generate_content_stream(contents) 
-
-        # --- FIX: End of Memory Implementation ---
+        # --- FIX: End of Memory and Streaming Implementation ---
         
         # Display AI response using streaming logic
         ai_text = ""
@@ -85,8 +93,9 @@ if user_input:
 
             # Final update without the cursor
             placeholder.markdown(ai_text)
-
-        # Save the complete AI response in session
+            
+        # The chat object automatically handles saving history internally, 
+        # but we must still update st.session_state for Streamlit's display and next turn's history setup.
         st.session_state.messages.append({"role": "assistant", "text": ai_text})
 
     except Exception as e:
