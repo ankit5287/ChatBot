@@ -60,29 +60,33 @@ if user_input:
              # The API expects role 'model' for the assistant's responses
              role = "user" if msg["role"] == "user" else "model" 
              
-             # FIX: Using the correct, fully-qualified names (genai.types.Content/Part)
-             # is causing issues, likely due to an environment/version mismatch.
-             # We will stick to the previous, less explicit structure which is also valid 
-             # for multi-turn history with the SDK, which often resolves type errors.
-             
+             # FIX: Using the dictionary list structure to avoid type errors
              contents.append(
                  {"role": role, "parts": [{"text": msg["text"]}]}
              )
 
 
-        # 2. Generate response by passing the full 'contents' list (enabling memory)
-        # We revert to a dictionary list structure which is accepted by the SDK 
-        # for multi-turn history and avoids the Type object error.
-        response = model.generate_content(contents) 
+        # 2. FIX: Generate response using STREAMING for better perceived performance
+        response_stream = model.generate_content_stream(contents) 
 
         # --- FIX: End of Memory Implementation ---
-
-        # Display AI response
-        ai_text = response.text
+        
+        # Display AI response using streaming logic
+        ai_text = ""
         with st.chat_message("assistant"):
-            st.markdown(ai_text)
+            # Use a placeholder to continuously update the text output
+            placeholder = st.empty()
+            
+            for chunk in response_stream:
+                if chunk.text:
+                    ai_text += chunk.text
+                    # Update the placeholder with the new text and a temporary cursor
+                    placeholder.markdown(ai_text + "▌") 
 
-        # Save AI response in session
+            # Final update without the cursor
+            placeholder.markdown(ai_text)
+
+        # Save the complete AI response in session
         st.session_state.messages.append({"role": "assistant", "text": ai_text})
 
     except Exception as e:
