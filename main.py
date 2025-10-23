@@ -62,7 +62,7 @@ if user_input:
     st.session_state.messages.append({"role": "user", "text": user_input})
 
     try:
-        # --- FIX: Start of Memory Implementation and ADDING SEARCH GROUNDING ---
+        # --- FIX: Start of Memory Implementation ---
         
         # 1. Format the entire conversation history (including the current turn) for the API
         contents = []
@@ -75,16 +75,9 @@ if user_input:
                  {"role": role, "parts": [{"text": msg["text"]}]}
              )
         
-        # 2. Call generate_content with history (memory) and the Google Search tool (grounding)
-        response = model.generate_content(
-            contents,
-            # FINAL FIX ATTEMPT for Search Grounding: Use the config dictionary structure
-            config={
-                "tools": [
-                    {"google_search": {}} # Using the snake_case name inside the config block
-                ]
-            }
-        ) 
+        # 2. Call generate_content with history (memory)
+        # REMOVED the incompatible 'config' parameter to fix the latest error.
+        response = model.generate_content(contents) 
 
         # --- FIX: End of Memory Implementation ---
         
@@ -95,6 +88,5 @@ if user_input:
             
         # Save AI response in session
         st.session_state.messages.append({"role": "assistant", "text": ai_text})
-
     except Exception as e:
         st.error(f"Error: {e}")
