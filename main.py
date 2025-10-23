@@ -2,11 +2,18 @@ import os
 import streamlit as st
 from dotenv import load_dotenv
 import google.generativeai as genai
+import datetime # 1. Import datetime module
 
 # Define creator details as constants
 CREATOR_NAME = "Ankit Nandoliya"
 CREATOR_PORTFOLIO = "https://ankit52-git-main-ankitnandoliya32-8971s-projects.vercel.app/"
-CREATOR_KEYWORDS = ["who built you", "who made you", "your creator", "your developer", "who created you", "who is ankit", "tell me about ankit", "who is my master", "tell me about yourself", "what is your name", "your name", "who are you"]
+CREATOR_KEYWORDS = [
+    "who built you", "who made you", "your creator", "your developer", 
+    "who created you", "who is ankit", "tell me about ankit", "who is my master", 
+    "tell me about yourself", "what is your name", "your name", "who are you",
+    # 2. Add date keywords
+    "todays date", "what is the date", "current date", "what day is it", "today's date"
+]
 
 # --- ADDED DETAILED PROFILE HISTORY (Simplified) ---
 CREATOR_PROFILE = """
@@ -122,8 +129,9 @@ if user_input:
     ai_text = ""
     
     # 1. Custom Question Handling (Bypass API)
-    # This logic ensures that if a creator keyword is found, the API is bypassed, preventing any Google search.
-    is_creator_query = any(keyword in user_input.lower() for keyword in CREATOR_KEYWORDS)
+    lower_input = user_input.lower()
+    is_creator_query = any(keyword in lower_input for keyword in CREATOR_KEYWORDS)
+    is_date_query = any(keyword in lower_input for keyword in ["todays date", "what is the date", "current date", "what day is it", "today's date"])
 
     if is_creator_query:
         # Hardcoded response for creator identity
@@ -133,6 +141,9 @@ if user_input:
             f"{CREATOR_PROFILE}"
             f"\n\nFor more details on his projects and technical background, please visit his portfolio here: **[{CREATOR_PORTFOLIO}]({CREATOR_PORTFOLIO})**"
         )
+    elif is_date_query: # Check for date query
+        current_date = datetime.date.today().strftime("%A, %B %d, %Y")
+        ai_text = f"The current system date is **{current_date}**."
     else:
         # 2. Normal Gemini API Call (if not a custom question)
         try:
@@ -148,9 +159,8 @@ if user_input:
                  )
             
             # Call generate_content with history (memory). 
-            # FIX: The tools parameter is now COMPLETELY removed for stability.
             response = model.generate_content(
-                contents
+                contentsa
             ) 
             ai_text = response.text
 
