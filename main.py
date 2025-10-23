@@ -51,10 +51,9 @@ st.title("💻 J.A.R.V.I.S. AI System")
 MODEL_NAME = "gemini-2.5-flash"
 
 # Initialize the model
-# FIX: Attempting to enable Google Search by passing 'tools' to the model constructor
+# FIX: Removing incompatible 'tools' parameter to stop the ValueError.
 model = genai.GenerativeModel(
-    MODEL_NAME,
-    tools=[{"googleSearch": {}}] 
+    MODEL_NAME
 )
 
 # --- NEW FUNCTION FOR HISTORY SIDEBAR ---
