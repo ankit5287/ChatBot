@@ -6,7 +6,7 @@ import google.generativeai as genai
 # Define creator details as constants
 CREATOR_NAME = "Ankit Nandoliya"
 CREATOR_PORTFOLIO = "https://ankit52-git-main-ankitnandoliya32-8971s-projects.vercel.app/"
-CREATOR_KEYWORDS = ["who built you", "who made you", "your creator", "your developer", "who created you", "who is ankit"]
+CREATOR_KEYWORDS = ["who built you", "who made you", "your creator", "your developer", "who created you", "who is ankit", "tell me about ankit", "who is my master", "tell me about yourself"]
 
 # --- ADDED DETAILED PROFILE HISTORY (Simplified) ---
 CREATOR_PROFILE = """
@@ -78,6 +78,7 @@ if user_input:
     ai_text = ""
     
     # 1. Custom Question Handling (Bypass API)
+    # This logic ensures that if a creator keyword is found, the API is bypassed, preventing any Google search.
     is_creator_query = any(keyword in user_input.lower() for keyword in CREATOR_KEYWORDS)
 
     if is_creator_query:
