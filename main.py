@@ -47,12 +47,14 @@ st.set_page_config(
 
 st.title("💻 J.A.R.V.I.S. AI System")
 
-# Choose Gemini model (gemini-2.5-flash is the current stable name)
-MODEL_NAME = "gemini-2.5-flash"
+# Choose Gemini model (use a current, tool-capable model)
+MODEL_NAME = "gemini-1.5-pro-latest" 
 
 # Initialize the model
-model = genai.GenerativeModel(MODEL_NAME)
-
+model = genai.GenerativeModel(
+    MODEL_NAME,
+    tools=["google_search"]  # <-- THIS IS THE FIX
+)
 # Chat history stored in session state
 if "messages" not in st.session_state:
     st.session_state.messages = []
