@@ -23,7 +23,7 @@ genai.configure(api_key=api_key)
 # REVERT: Set layout back to 'centered'
 st.set_page_config(
     page_title="J.A.R.V.I.S.", # RENAME PAGE TITLE
-    page_icon="💻", # CHANGED ICON TO A MORE SUITABLE ONE
+    # CHANGED ICON TO A MORE SUITABLE ONE
     layout="centered", # REVERTED TO CENTERED
 )
 
