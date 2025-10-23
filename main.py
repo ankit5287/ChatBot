@@ -103,11 +103,10 @@ if user_input:
                      {"role": role, "parts": [{"text": msg["text"]}]}
                  )
             
-            # Call generate_content with history (memory) AND search tool
+            # Call generate_content with history (memory)
+            # FIX: REMOVED the incompatible tools parameter to prevent crashing.
             response = model.generate_content(
-                contents,
-                # FIX: Re-enabling search tool using the simplest dictionary structure.
-                tools=[{"google_search": {}}] 
+                contents
             ) 
             ai_text = response.text
 
