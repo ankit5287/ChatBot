@@ -40,12 +40,12 @@ genai.configure(api_key=api_key)
 # Streamlit page settings
 st.set_page_config(
     page_title="J.A.R.V.I.S.",
-    page_icon="💻",
+    page_icon="",
     layout="centered",
 )
 
 
-st.title("💻 J.A.R.V.I.S. AI System")
+st.title("J.A.R.V.I.S")
 
 # Choose Gemini model (gemini-2.5-flash is the current stable name)
 MODEL_NAME = "gemini-2.5-flash"
