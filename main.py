@@ -6,18 +6,18 @@ import google.generativeai as genai
 # Define creator details as constants
 CREATOR_NAME = "Ankit Nandoliya"
 CREATOR_PORTFOLIO = "https://ankit52-git-main-ankitnandoliya32-8971s-projects.vercel.app/"
-CREATOR_KEYWORDS = ["who built you", "who made you", "your creator", "your developer", "who created you", "who is ankit"]
+CREATOR_KEYWORDS = ["who built you", "who made you", "your creator", "your developer", "who created you", "who is ankit", "tell me about ankit", "who is my master"]
 
-# --- ADDED DETAILED PROFILE HISTORY ---
+# --- ADDED DETAILED PROFILE HISTORY (Simplified) ---
 CREATOR_PROFILE = """
-**Ankit Nandoliya** is a highly skilled software developer with a strong focus on full-stack development and artificial intelligence integration. His technical history is characterized by a passion for creating seamless user experiences and robust, scalable backend systems.
+**Ankit Nandoliya** is a software developer focused on full-stack development and artificial intelligence integration. He creates smooth user experiences and stable, scalable backend systems.
 
 **Key Expertise:**
-* **Full Stack Development:** Proficient in modern JavaScript frameworks (like React or Angular) and Python/Node.js for backend services.
-* **AI/ML Integration:** Experienced in deploying generative models and leveraging APIs to build intelligent applications, like this J.A.R.V.I.S. system.
-* **Cloud & Deployment:** Knowledgeable in setting up secure, scalable environments using platforms like Vercel and similar cloud services.
+* **Full Stack Development:** Experienced with modern JavaScript frameworks (like React or Angular) and Python/Node.js for backend services.
+* **AI/ML Integration:** Works with generative models and APIs to build intelligent applications, like this J.A.R.V.I.S. system.
+* **Cloud & Deployment:** Familiar with setting up applications using platforms like Vercel and similar cloud services.
 
-He approaches every project with a blend of creative problem-solving and meticulous attention to detail, resulting in functional and high-performance applications.
+He approaches projects with a focus on problem-solving and attention to detail.
 """
 # --- END ADDED DETAILED PROFILE HISTORY ---
 
@@ -83,7 +83,7 @@ if user_input:
     if is_creator_query:
         # Hardcoded response for creator identity
         ai_text = (
-            f"I was built by the highly skilled developer, **{CREATOR_NAME}**. "
+            f"I was built by the developer, **{CREATOR_NAME}**. "
             f"\n\n--- **Creator Profile and History** ---\n\n"
             f"{CREATOR_PROFILE}"
             f"\n\nFor more details on his projects and technical background, please visit his portfolio here: **[{CREATOR_PORTFOLIO}]({CREATOR_PORTFOLIO})**"
