@@ -3,6 +3,24 @@ import streamlit as st
 from dotenv import load_dotenv
 import google.generativeai as genai
 
+# Define creator details as constants
+CREATOR_NAME = "Ankit Nandoliya"
+CREATOR_PORTFOLIO = "https://ankit52-git-main-ankitnandoliya32-8971s-projects.vercel.app/"
+CREATOR_KEYWORDS = ["who built you", "who made you", "your creator", "your developer", "who created you", "who is ankit"]
+
+# --- ADDED DETAILED PROFILE HISTORY ---
+CREATOR_PROFILE = """
+**Ankit Nandoliya** is a highly skilled software developer with a strong focus on full-stack development and artificial intelligence integration. His technical history is characterized by a passion for creating seamless user experiences and robust, scalable backend systems.
+
+**Key Expertise:**
+* **Full Stack Development:** Proficient in modern JavaScript frameworks (like React or Angular) and Python/Node.js for backend services.
+* **AI/ML Integration:** Experienced in deploying generative models and leveraging APIs to build intelligent applications, like this J.A.R.V.I.S. system.
+* **Cloud & Deployment:** Knowledgeable in setting up secure, scalable environments using platforms like Vercel and similar cloud services.
+
+He approaches every project with a blend of creative problem-solving and meticulous attention to detail, resulting in functional and high-performance applications.
+"""
+# --- END ADDED DETAILED PROFILE HISTORY ---
+
 # Load environment variables from .env
 try:
     load_dotenv()
@@ -20,18 +38,14 @@ genai.configure(api_key=api_key)
 
 
 # Streamlit page settings
-# REVERT: Set layout back to 'centered'
 st.set_page_config(
-    page_title="J.A.R.V.I.S.", # RENAME PAGE TITLE
-    page_icon="💻", # CHANGED ICON TO A MORE SUITABLE ONE
-    layout="centered", # REVERTED TO CENTERED
+    page_title="J.A.R.V.I.S.",
+    page_icon="💻",
+    layout="centered",
 )
 
-# --- REMOVED UI CUSTOMIZATION BLOCK ---
 
-
-st.title("💻 J.A.R.V.I.S. AI System") # RENAME MAIN TITLE
-# REMOVED JARVIS TAGLINE (st.subheader)
+st.title("💻 J.A.R.V.I.S. AI System")
 
 # Choose Gemini model (gemini-2.5-flash is the current stable name)
 MODEL_NAME = "gemini-2.5-flash"
@@ -42,7 +56,7 @@ model = genai.GenerativeModel(MODEL_NAME)
 # Chat history stored in session state
 if "messages" not in st.session_state:
     st.session_state.messages = []
-    # UPDATED INITIAL GREETING MESSAGE HERE (REMOVED COMMA)
+    # INITIAL GREETING MESSAGE
     st.session_state.messages.append({
         "role": "assistant",
         "text": "Hi I am Jarvis"
@@ -61,32 +75,46 @@ if user_input:
     st.chat_message("user").markdown(user_input)
     st.session_state.messages.append({"role": "user", "text": user_input})
 
-    try:
-        # --- FIX: Start of Memory Implementation ---
-        
-        # 1. Format the entire conversation history (including the current turn) for the API
-        contents = []
-        for msg in st.session_state.messages:
-             # The API expects role 'model' for the assistant's responses
-             role = "user" if msg["role"] == "user" else "model" 
-             
-             # Using the dictionary list structure to avoid type errors
-             contents.append(
-                 {"role": role, "parts": [{"text": msg["text"]}]}
-             )
-        
-        # 2. Call generate_content with history (memory)
-        # REMOVED the incompatible 'config' parameter to fix the latest error.
-        response = model.generate_content(contents) 
+    ai_text = ""
+    
+    # 1. Custom Question Handling (Bypass API)
+    is_creator_query = any(keyword in user_input.lower() for keyword in CREATOR_KEYWORDS)
 
-        # --- FIX: End of Memory Implementation ---
-        
-        # Display AI response
-        ai_text = response.text
+    if is_creator_query:
+        # Hardcoded response for creator identity
+        ai_text = (
+            f"I was built by the highly skilled developer, **{CREATOR_NAME}**. "
+            f"\n\n--- **Creator Profile and History** ---\n\n"
+            f"{CREATOR_PROFILE}"
+            f"\n\nFor more details on his projects and technical background, please visit his portfolio here: **[{CREATOR_PORTFOLIO}]({CREATOR_PORTFOLIO})**"
+        )
+    else:
+        # 2. Normal Gemini API Call (if not a custom question)
+        try:
+            # Format the entire conversation history (for memory)
+            contents = []
+            for msg in st.session_state.messages:
+                 # The API expects role 'model' for the assistant's responses
+                 role = "user" if msg["role"] == "user" else "model" 
+                 
+                 # Using the dictionary list structure to avoid type errors
+                 contents.append(
+                     {"role": role, "parts": [{"text": msg["text"]}]}
+                 )
+            
+            # Call generate_content with history (memory)
+            response = model.generate_content(contents) 
+            ai_text = response.text
+
+        except Exception as e:
+            # Fallback if API call fails
+            st.error(f"I encountered an error trying to access the AI: {e}")
+            ai_text = "My systems are currently experiencing a brief technical fault. Please try again."
+
+    # 3. Display and Save AI response (from custom handler or API)
+    if ai_text:
         with st.chat_message("assistant"):
             st.markdown(ai_text)
             
         # Save AI response in session
         st.session_state.messages.append({"role": "assistant", "text": ai_text})
-    except Exception as e:
-        st.error(f"Error: {e}")
