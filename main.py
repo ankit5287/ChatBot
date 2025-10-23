@@ -18,10 +18,14 @@ if 'username' not in st.session_state:
 if 'users' not in st.session_state:
     # Simulated user database for simplicity: {username: password}
     st.session_state.users = {"ankit": "password123"} 
+    
+if 'is_guest' not in st.session_state:
+    st.session_state.is_guest = False
 
 
 # --- AUTHENTICATION HANDLERS ---
 def handle_login(user, password):
+    st.session_state.is_guest = False
     if user in st.session_state.users and st.session_state.users[user] == password:
         st.session_state.logged_in = True
         st.session_state.username = user
@@ -31,6 +35,7 @@ def handle_login(user, password):
         st.error("Login failed: Invalid username or password.")
 
 def handle_signup(user, password):
+    st.session_state.is_guest = False
     if user in st.session_state.users:
         st.error("Sign up failed: Username already exists.")
     elif not user or not password:
@@ -40,9 +45,17 @@ def handle_signup(user, password):
         st.success("Account created successfully! Please log in.")
         st.session_state.login_tab = "Login" # Switch to login tab
 
+def handle_guest_login():
+    st.session_state.is_guest = True
+    st.session_state.logged_in = True
+    st.session_state.username = "Guest"
+    st.success("Welcome, Guest! Access granted.")
+    st.experimental_rerun()
+
 def handle_logout():
     st.session_state.logged_in = False
     st.session_state.username = None
+    st.session_state.is_guest = False
     # Clear chat history upon logout to start fresh
     st.session_state.messages = [] 
     st.experimental_rerun()
@@ -98,6 +111,11 @@ def show_auth_screen():
             st.session_state.login_tab = "Sign Up"
             
     st.markdown("---")
+    
+    # --- OPTIONAL GUEST ACCESS ---
+    if st.button("Continue as Guest"):
+        handle_guest_login()
+        
     st.info("Hint: Use username 'ankit' and password 'password123' to log in immediately.")
 
 # --- MAIN CHAT APPLICATION ---
@@ -195,6 +213,8 @@ if st.session_state.logged_in:
     # Display welcome message and logout button in the sidebar
     with st.sidebar:
         st.title("User Profile")
+        if st.session_state.is_guest:
+            st.markdown("**(Guest Mode - History is temporary)**")
         st.markdown(f"**Logged in as:** `{st.session_state.username}`")
         st.markdown("---")
         if st.button("🔴 Logout"):
