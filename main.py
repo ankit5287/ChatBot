@@ -61,7 +61,7 @@ st.title("💻 J.A.R.V.I.S. AI System")
 MODEL_NAME = "gemini-2.5-flash"
 
 # Initialize the model
-# FIX: Removing incompatible 'tools' parameter to stop the ValueError.
+# FIX: Removing incompatible 'tools' parameter from constructor to stop the ValueError.
 model = genai.GenerativeModel(
     MODEL_NAME
 )
@@ -147,9 +147,11 @@ if user_input:
                      {"role": role, "parts": [{"text": msg["text"]}]}
                  )
             
-            # Call generate_content with history (memory). 
+            # Call generate_content with history (memory) AND RE-ENABLE SEARCH
+            # FINAL ATTEMPT to use the simplest dictionary structure for Google Search grounding.
             response = model.generate_content(
-                contents
+                contents,
+                tools=[{"googleSearch": {}}] # Using 'googleSearch' as a final attempt
             ) 
             ai_text = response.text
 
