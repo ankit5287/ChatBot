@@ -40,14 +40,14 @@ genai.configure(api_key=api_key)
 # Streamlit page settings
 st.set_page_config(
     page_title="J.A.R.V.I.S.",
-    page_icon="💻",
+    page_icon="",
     layout="centered",
 )
 
 # --- NEW FUNCTION FOR HISTORY SIDEBAR ---
 def show_history_sidebar():
     """Displays user's question history in the Streamlit sidebar."""
-    st.sidebar.title("💬 Conversation History")
+    st.sidebar.title("Conversation History")
     
     # Filter for user messages and reverse to show most recent first
     # Skips the initial greeting message if present (by looking for 'user' role)
@@ -58,7 +58,7 @@ def show_history_sidebar():
 
     if user_queries:
         # Add a clear history button at the top of the sidebar history list
-        if st.sidebar.button("🗑️ Clear Chat History"):
+        if st.sidebar.button("Clear Chat History"):
             st.session_state.messages = [{
                 "role": "assistant",
                 "text": "Hi I am Jarvis"
@@ -79,7 +79,7 @@ def show_history_sidebar():
         st.sidebar.info("Start a conversation to see your recent questions here.")
 # --- END NEW FUNCTION ---
 
-st.title("💻 J.A.R.V.I.S. AI System")
+st.title("J.A.R.V.I.S.")
 
 # CALL THE NEW SIDEBAR FUNCTION HERE
 show_history_sidebar()
