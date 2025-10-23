@@ -23,14 +23,14 @@ genai.configure(api_key=api_key)
 # REVERT: Set layout back to 'centered'
 st.set_page_config(
     page_title="J.A.R.V.I.S.", # RENAME PAGE TITLE
-    # CHANGED ICON TO A MORE SUITABLE ONE
+    page_icon="💻", # CHANGED ICON TO A MORE SUITABLE ONE
     layout="centered", # REVERTED TO CENTERED
 )
 
 # --- REMOVED UI CUSTOMIZATION BLOCK ---
 
 
-st.title("J.A.R.V.I.S") # RENAME MAIN TITLE
+st.title("💻 J.A.R.V.I.S. AI System") # RENAME MAIN TITLE
 # REMOVED JARVIS TAGLINE (st.subheader)
 
 # Choose Gemini model (gemini-2.5-flash is the current stable name)
@@ -62,7 +62,7 @@ if user_input:
     st.session_state.messages.append({"role": "user", "text": user_input})
 
     try:
-        # --- FIX: Start of Memory Implementation (Reverting to reliable non-streaming method) ---
+        # --- FIX: Start of Memory Implementation and ADDING SEARCH GROUNDING ---
         
         # 1. Format the entire conversation history (including the current turn) for the API
         contents = []
@@ -75,9 +75,11 @@ if user_input:
                  {"role": role, "parts": [{"text": msg["text"]}]}
              )
         
-        # 2. Revert to the stable, non-streaming call that works for memory
-        # We know this call works reliably for memory.
-        response = model.generate_content(contents) 
+        # 2. Call generate_content with history (memory) and the Google Search tool (grounding)
+        response = model.generate_content(
+            contents,
+            tools=[{"google_search": {}}] # <--- ADDED GOOGLE SEARCH FOR REAL-TIME ANSWERS
+        ) 
 
         # --- FIX: End of Memory Implementation ---
         
