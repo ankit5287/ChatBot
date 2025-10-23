@@ -11,7 +11,6 @@ CREATOR_KEYWORDS = [
     "who built you", "who made you", "your creator", "your developer", 
     "who created you", "who is ankit", "tell me about ankit", "who is my master", 
     "tell me about yourself", "what is your name", "your name", "who are you",
-    # 2. Add date keywords
 ]
 
 # --- ADDED DETAILED PROFILE HISTORY (Simplified) ---
@@ -159,7 +158,7 @@ if user_input:
             
             # Call generate_content with history (memory). 
             response = model.generate_content(
-                contentsa
+                contents
             ) 
             ai_text = response.text
 
