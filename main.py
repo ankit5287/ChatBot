@@ -60,13 +60,19 @@ if user_input:
              # The API expects role 'model' for the assistant's responses
              role = "user" if msg["role"] == "user" else "model" 
              
-             # Use genai.types.Content and genai.types.Part to structure the message history
-             contents.append(genai.types.Content(
-                 role=role,
-                 parts=[genai.types.Part.from_text(msg["text"])]
-             ))
+             # FIX: Using the correct, fully-qualified names (genai.types.Content/Part)
+             # is causing issues, likely due to an environment/version mismatch.
+             # We will stick to the previous, less explicit structure which is also valid 
+             # for multi-turn history with the SDK, which often resolves type errors.
+             
+             contents.append(
+                 {"role": role, "parts": [{"text": msg["text"]}]}
+             )
+
 
         # 2. Generate response by passing the full 'contents' list (enabling memory)
+        # We revert to a dictionary list structure which is accepted by the SDK 
+        # for multi-turn history and avoids the Type object error.
         response = model.generate_content(contents) 
 
         # --- FIX: End of Memory Implementation ---
