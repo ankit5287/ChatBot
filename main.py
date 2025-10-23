@@ -6,7 +6,7 @@ import google.generativeai as genai
 # Define creator details as constants
 CREATOR_NAME = "Ankit Nandoliya"
 CREATOR_PORTFOLIO = "https://ankit52-git-main-ankitnandoliya32-8971s-projects.vercel.app/"
-CREATOR_KEYWORDS = ["who built you", "who made you", "your creator", "your developer", "who created you", "who is ankit", "tell me about ankit", "who is my master", "tell me about yourself"]
+CREATOR_KEYWORDS = ["who built you", "who made you", "your creator", "your developer", "who created you", "who is ankit", "tell me about ankit", "who is my master", "tell me about yourself", "what is your name", "your name", "who are you"]
 
 # --- ADDED DETAILED PROFILE HISTORY (Simplified) ---
 CREATOR_PROFILE = """
@@ -40,12 +40,12 @@ genai.configure(api_key=api_key)
 # Streamlit page settings
 st.set_page_config(
     page_title="J.A.R.V.I.S.",
-    page_icon="🤖",
+    page_icon="💻",
     layout="centered",
 )
 
 
-st.title("🤖 J.A.R.V.I.S")
+st.title("💻 J.A.R.V.I.S. AI System")
 
 # Choose Gemini model (gemini-2.5-flash is the current stable name)
 MODEL_NAME = "gemini-2.5-flash"
@@ -103,8 +103,12 @@ if user_input:
                      {"role": role, "parts": [{"text": msg["text"]}]}
                  )
             
-            # Call generate_content with history (memory)
-            response = model.generate_content(contents) 
+            # Call generate_content with history (memory) AND search tool
+            response = model.generate_content(
+                contents,
+                # FIX: Re-enabling search tool using the simplest dictionary structure.
+                tools=[{"google_search": {}}] 
+            ) 
             ai_text = response.text
 
         except Exception as e:
