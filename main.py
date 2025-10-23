@@ -78,7 +78,8 @@ if user_input:
         # 2. Call generate_content with history (memory) and the Google Search tool (grounding)
         response = model.generate_content(
             contents,
-            tools=[{"google_search": {}}] # <--- ADDED GOOGLE SEARCH FOR REAL-TIME ANSWERS
+            # FIX: Capitalizing 'googleSearch' often resolves the 'Unknown field' error
+            tools=[{"googleSearch": {}}]
         ) 
 
         # --- FIX: End of Memory Implementation ---
