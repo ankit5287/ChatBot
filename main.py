@@ -50,14 +50,19 @@ if not api_key:
     
 genai.configure(api_key=api_key)
 
+# Define the explicit Google Search tool function structure
+# This is the most robust way to define the tool when constants/strings fail.
+GOOGLE_SEARCH_TOOL_EXPLICIT = Tool.from_dict({
+    "google_search": {}
+})
+
+
 # Initialize the model with the Google Search tool enabled
-# NEW FIX: Using Tool.FLEXIBLE_SEARCH_TOOL, which is the official constant name 
-# for the tool in some SDK versions, after the string list failed again.
+# FINAL FIX ATTEMPT: Using the explicit tool definition object.
 try:
     model = genai.GenerativeModel(
         MODEL_NAME,
-        # Trying the official constant name after the string failed repeatedly
-        tools=[Tool.FLEXIBLE_SEARCH_TOOL] 
+        tools=[GOOGLE_SEARCH_TOOL_EXPLICIT] 
     )
 except Exception as e:
      st.error(f"Initialization Error: {e}. I am unable to resolve the tool name. Please verify your SDK version in requirements.txt.")
