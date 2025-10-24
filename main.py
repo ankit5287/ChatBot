@@ -29,7 +29,8 @@ He approaches projects with a focus on problem-solving and attention to detail.
 """
 
 # Use a tool-capable model for real-time information
-MODEL_NAME = "gemini-1.5-pro-latest" 
+# FIX 1: Changed model name to a known, stable model (gemini-2.5-flash) to resolve the 404 error.
+MODEL_NAME = "gemini-2.5-flash" 
 
 
 # --- API KEY & MODEL INITIALIZATION ---
@@ -51,7 +52,6 @@ if not api_key:
 genai.configure(api_key=api_key)
 
 # Initialize the model without the 'tools' parameter.
-# This avoids the fatal deployment error that has persisted through multiple fix attempts.
 model = genai.GenerativeModel(MODEL_NAME)
 
 
@@ -136,5 +136,5 @@ if user_input:
         # Save AI response in session
         st.session_state.messages.append({"role": "assistant", "text": ai_text})
 
-    # Rerun the app to update the display immediately
-    st.experimental_rerun()
+    # FIX 2: Replaced deprecated st.experimental_rerun() with st.rerun()
+    st.rerun()
