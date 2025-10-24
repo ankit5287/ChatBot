@@ -50,20 +50,9 @@ if not api_key:
     
 genai.configure(api_key=api_key)
 
-# Removed: GOOGLE_SEARCH_TOOL_EXPLICIT definition which caused the AttributeError.
-
-# Initialize the model with the Google Search tool enabled
-# FINAL ATTEMPT: Reverting to the simplest string list. This is the only remaining
-# possibility that might work with an older/incompatible environment setup.
-try:
-    model = genai.GenerativeModel(
-        MODEL_NAME,
-        tools=["google_search"] 
-    )
-except Exception as e:
-     # If this fails, the environment is fundamentally incompatible with the API call structure.
-     st.error(f"Initialization Error: {e}. I cannot resolve the tool name. Please check your SDK version in requirements.txt.")
-     st.stop()
+# Initialize the model without the 'tools' parameter.
+# This avoids the fatal deployment error that has persisted through multiple fix attempts.
+model = genai.GenerativeModel(MODEL_NAME)
 
 
 # --- STREAMLIT APP SETUP ---
