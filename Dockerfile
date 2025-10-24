@@ -1,40 +1,37 @@
-# Use the official Python image as the base
+# Use the official Python image as the base for a stable environment
 FROM python:3.11-slim
 
 # Set the working directory inside the container
 WORKDIR /usr/src/app
 
-# Install system dependencies needed for some Python packages (like cryptography, etc.)
-# and common build tools.
+# Install system dependencies needed for robust deployment (e.g., building certain Python packages)
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     build-essential \
     curl \
     git \
-    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # --- CUSTOM DEPENDENCY INSTALLATION ---
-# Pinned installation to guarantee tool compatibility and avoid conflicts.
-# Using 0.8.0 as a highly stable fallback version for tool enabling.
+# Install Streamlit and the core dependencies.
+# IMPORTANT: This installs the 'google-genai' client library to match your main.py file.
 RUN pip install --no-cache-dir \
     streamlit \
-    google-generativeai==0.8.0 \
+    google-genai \
     requests \
     python-dotenv
 
-# Copy all application files (including main.py, .env, .streamlit/config.toml, etc.)
-# in one clean step to the workdir.
+# Copy all application files (main.py, .streamlit/config.toml, etc.) to the workdir
 COPY . .
 
 # Expose the port that Streamlit runs on (default 8501)
 EXPOSE 8501
 
-# Setting this ENV variable is the correct fix, but if it fails again, 
-# you MUST ensure this environment variable is ALSO set on the Render service itself 
-# (in the environment variables section) to the correct path, which is usually just `/`.
+# FIX for Streamlit behind a proxy (like Render). 
+# This tells Streamlit to look for assets starting at the root path.
+# IMPORTANT: Ensure this variable is ALSO set on your Render service as an environment variable.
 ENV STREAMLIT_SERVER_BASE_URL_PATH="/"
 
-# Command to run the Streamlit app when the container starts
-# We use the port defined in config.toml
+# Command to run the Streamlit app when the container starts.
+# We run 'main.py' as confirmed by your repository structure.
 CMD ["streamlit", "run", "main.py", "--server.port=8501", "--server.address=0.0.0.0"]
