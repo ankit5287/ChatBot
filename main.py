@@ -2,8 +2,8 @@ import os
 import streamlit as st
 from dotenv import load_dotenv
 import google.generativeai as genai
-# Import the specific tool configuration
-from google.generativeai.types import Tool
+# Import the specific tool configuration for modern SDK usage
+from google.generativeai.types import Tool 
 
 # --- CONFIGURATION CONSTANTS ---
 
@@ -34,7 +34,7 @@ MODEL_NAME = "gemini-1.5-pro-latest"
 
 # --- API KEY & MODEL INITIALIZATION ---
 
-# Load environment variables from .env
+# Load environment variables from .env (for local testing)
 try:
     load_dotenv()
 except ImportError:
@@ -44,22 +44,21 @@ except ImportError:
 api_key = os.getenv("GOOGLE_API_KEY") or st.secrets.get("GOOGLE_API_KEY")
 
 if not api_key:
-    st.error("Configuration Error: GOOGLE_API_KEY not found. Please set it in your .env file or Streamlit Secrets.")
+    # Stop execution if API key is missing
+    st.error("Configuration Error: GOOGLE_API_KEY not found. Please set it in your environment or Streamlit Secrets.")
     st.stop()
     
 genai.configure(api_key=api_key)
 
 # Initialize the model with the Google Search tool enabled
-# FIX: Use the specific Tool.GOOGLE_SEARCH_TOOL object instead of the string "google_search"
+# FIX: Use the Tool.GOOGLE_SEARCH_TOOL object instead of the string "google_search"
 try:
     model = genai.GenerativeModel(
         MODEL_NAME,
-        tools=[Tool.GOOGLE_SEARCH_TOOL] # <--- FIX APPLIED HERE
+        tools=[Tool.GOOGLE_SEARCH_TOOL] # Correct way to enable Google Search grounding
     )
-except ValueError as e:
-     # This part of the code is less likely to be reached with the fix, 
-     # but kept as a robust safeguard.
-     st.error(f"Initialization Error: {e}. Please ensure your 'google-generativeai' library is version >= 0.5.0 in your requirements.txt.")
+except Exception as e:
+     st.error(f"Initialization Error: {e}. Please ensure you have a recent version of the google-generativeai library installed.")
      st.stop()
 
 
@@ -124,7 +123,11 @@ if user_input:
                 )
             
             # Call generate_content with history (memory)
-            response = model.generate_content(contents) 
+            # Use st.spinner to show a loading state during API call
+            with st.spinner("J.A.R.V.I.S. is processing..."):
+                # Pass the history minus the initial greeting
+                response = model.generate_content(contents[1:]) 
+            
             ai_text = response.text
 
         except Exception as e:
@@ -139,3 +142,6 @@ if user_input:
             
         # Save AI response in session
         st.session_state.messages.append({"role": "assistant", "text": ai_text})
+
+    # Rerun the app to update the display immediately
+    st.experimental_rerun()
