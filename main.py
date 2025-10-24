@@ -51,8 +51,18 @@ if not api_key:
     
 genai.configure(api_key=api_key)
 
-# Initialize the model without the 'tools' parameter.
-model = genai.GenerativeModel(MODEL_NAME)
+# Initialize the model WITH the 'tools' parameter for Google Search.
+# This re-enables real-time data access, assuming the requirements.txt fix works.
+try:
+    model = genai.GenerativeModel(
+        MODEL_NAME,
+        tools=["google_search"] 
+    )
+except Exception as e:
+    # If this fails again, print the error but fall back to the non-tool model.
+    # We must not stop the app, so we initialize a model without tools here.
+    st.warning("Could not enable Google Search Tool for real-time data. Using internal model data.")
+    model = genai.GenerativeModel(MODEL_NAME)
 
 
 # --- STREAMLIT APP SETUP ---
