@@ -2,7 +2,8 @@ import os
 import streamlit as st
 from dotenv import load_dotenv
 import google.generativeai as genai
-# Removed: from google.generativeai.types import Tool 
+# RE-ADDING IMPORT: We must import the Tool object because the simple string list is failing.
+from google.generativeai.types import Tool 
 
 # --- CONFIGURATION CONSTANTS ---
 
@@ -50,14 +51,16 @@ if not api_key:
 genai.configure(api_key=api_key)
 
 # Initialize the model with the Google Search tool enabled
-# REVERTED: Using the string name "google_search" as the constant name caused an error in your environment.
+# NEW FIX: Using Tool.FLEXIBLE_SEARCH_TOOL, which is the official constant name 
+# for the tool in some SDK versions, after the string list failed again.
 try:
     model = genai.GenerativeModel(
         MODEL_NAME,
-        tools=["google_search"] # Reverting to string name
+        # Trying the official constant name after the string failed repeatedly
+        tools=[Tool.FLEXIBLE_SEARCH_TOOL] 
     )
 except Exception as e:
-     st.error(f"Initialization Error: {e}. If the deployment fails here, it indicates a version incompatibility. Check requirements.txt.")
+     st.error(f"Initialization Error: {e}. I am unable to resolve the tool name. Please verify your SDK version in requirements.txt.")
      st.stop()
 
 
