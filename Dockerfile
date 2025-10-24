@@ -2,7 +2,7 @@
 FROM python:3.11-slim
 
 # Set the working directory inside the container
-WORKDIR /app
+WORKDIR /usr/src/app
 
 # Install system dependencies needed for some Python packages (like cryptography, etc.)
 # and common build tools.
@@ -18,16 +18,16 @@ RUN apt-get update && \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Explicitly copy the Streamlit configuration directory
-COPY .streamlit/ .streamlit/
-
-# Copy the rest of the application files (including main.py)
+# Copy all application files (including main.py, .env, .streamlit/config.toml, etc.)
+# in one clean step to the workdir.
 COPY . .
 
 # Expose the port that Streamlit runs on (default 8501)
 EXPOSE 8501
 
-# Set the environment variable for the base URL path, crucial for running behind a proxy like Render
+# Setting this ENV variable is the correct fix, but if it fails again, 
+# you MUST ensure this environment variable is ALSO set on the Render service itself 
+# (in the environment variables section) to the correct path, which is usually just `/`.
 ENV STREAMLIT_SERVER_BASE_URL_PATH="/"
 
 # Command to run the Streamlit app when the container starts
