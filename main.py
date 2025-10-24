@@ -1,9 +1,10 @@
 import os
 import streamlit as st
 from dotenv import load_dotenv
-import google.generativeai as genai
-# REMOVING IMPORT: The Tool object import is causing an AttributeError in your environment.
-# from google.generativeai.types import Tool 
+
+# Import the new Google Client SDK
+from google import genai
+from google.genai.errors import APIError
 
 # --- CONFIGURATION CONSTANTS ---
 
@@ -28,8 +29,7 @@ CREATOR_PROFILE = """
 He approaches projects with a focus on problem-solving and attention to detail.
 """
 
-# Use a tool-capable model for real-time information
-# FIX 1: Changed model name to a known, stable model (gemini-2.5-flash) to resolve the 404 error.
+# Use a standard, stable model name
 MODEL_NAME = "gemini-2.5-flash" 
 
 
@@ -39,35 +39,53 @@ MODEL_NAME = "gemini-2.5-flash"
 try:
     load_dotenv()
 except ImportError:
-    pass # Ignore if python-dotenv is not installed in deployment
+    pass
 
 # Configure API key (from environment variable or Streamlit Secrets)
+# The google-genai client automatically looks for GOOGLE_API_KEY environment variable.
 api_key = os.getenv("GOOGLE_API_KEY") or st.secrets.get("GOOGLE_API_KEY")
 
 if not api_key:
-    # Stop execution if API key is missing
-    st.error("Configuration Error: GOOGLE_API_KEY not found. Please set it in your environment or Streamlit Secrets.")
+    st.error("Configuration Error: GOOGLE_API_KEY not found. Please set it in your environment variables.")
     st.stop()
-    
-genai.configure(api_key=api_key)
 
-# Initialize the model WITH the 'tools' parameter for Google Search.
-# This re-enables real-time data access, assuming the requirements.txt fix works.
-try:
-    model = genai.GenerativeModel(
-        MODEL_NAME,
-        tools=["google_search"] 
-    )
-except Exception as e:
-    # If this fails again, print the error but fall back to the non-tool model.
-    # We must not stop the app, so we initialize a model without tools here.
-    st.warning("Could not enable Google Search Tool for real-time data. Using internal model data.")
-    model = genai.GenerativeModel(MODEL_NAME)
+
+# Initialize the Gemini Client object
+@st.cache_resource
+def get_gemini_client():
+    """Initializes and returns the Gemini client."""
+    try:
+        # The Client() automatically uses the GOOGLE_API_KEY env variable
+        client = genai.Client()
+        return client
+    except Exception as e:
+        st.error(f"Client Initialization Error: {e}")
+        st.stop()
+
+# Initialize Chat Session
+@st.cache_resource
+def get_chat_session(client):
+    """Initializes and returns a chat session with Google Search enabled as a tool."""
+    try:
+        # The 'google_search' tool is enabled here for real-time data access
+        chat = client.chats.create(
+            model=MODEL_NAME,
+            config=genai.types.GenerateContentConfig(
+                tools=[{"google_search": {}}] # Standard dict format for tools
+            )
+        )
+        return chat
+    except Exception as e:
+        # This error often occurs if the API key lacks necessary permissions or 
+        # the network blocks the tool initialization.
+        st.warning("Could not enable Google Search Tool for real-time data. Using internal model data.")
+        # Fallback to chat session without tools
+        chat = client.chats.create(model=MODEL_NAME)
+        return chat
 
 
 # --- STREAMLIT APP SETUP ---
 
-# Streamlit page settings
 st.set_page_config(
     page_title="J.A.R.V.I.S.",
     page_icon="💻",
@@ -75,6 +93,10 @@ st.set_page_config(
 )
 
 st.title("💻 J.A.R.V.I.S. AI System")
+
+# Get client and chat session
+gemini_client = get_gemini_client()
+chat_session = get_chat_session(gemini_client)
 
 # Chat history stored in session state
 if "messages" not in st.session_state:
@@ -112,31 +134,23 @@ if user_input:
             f"\n\nFor more details on his projects and technical background, please visit his portfolio here: **[{CREATOR_PORTFOLIO}]({CREATOR_PORTFOLIO})**"
         )
     else:
-        # 2. Normal Gemini API Call (if not a custom question)
+        # 2. Normal Gemini API Call
         try:
-            # Format the entire conversation history (for memory)
-            contents = []
-            for msg in st.session_state.messages:
-                # The API expects role 'model' for the assistant's responses
-                role = "user" if msg["role"] == "user" else "model" 
-                
-                # Using the dictionary list structure to avoid type errors
-                contents.append(
-                    {"role": role, "parts": [{"text": msg["text"]}]}
-                )
+            # Send the message to the chat session (which maintains history)
+            response = chat_session.send_message(user_input)
             
-            # Call generate_content with history (memory)
-            # Use st.spinner to show a loading state during API call
-            with st.spinner("J.A.R.V.I.S. is processing..."):
-                # Pass the history minus the initial greeting
-                response = model.generate_content(contents[1:]) 
-            
+            # The 'google-genai' SDK returns a Response object
             ai_text = response.text
 
-        except Exception as e:
+        except APIError as e:
             # Fallback if API call fails
-            st.error(f"I encountered an error trying to access the AI: {e}")
-            ai_text = "My systems are currently experiencing a brief technical fault. Please try again."
+            st.error(f"I encountered an API error trying to access the AI: {e}")
+            ai_text = "My systems are currently experiencing a brief technical fault."
+
+        except Exception as e:
+            st.error(f"An unexpected error occurred: {e}")
+            ai_text = "My systems are currently experiencing a brief technical fault."
+
 
     # 3. Display and Save AI response (from custom handler or API)
     if ai_text:
@@ -145,6 +159,3 @@ if user_input:
             
         # Save AI response in session
         st.session_state.messages.append({"role": "assistant", "text": ai_text})
-
-    # FIX 2: Replaced deprecated st.experimental_rerun() with st.rerun()
-    st.rerun()
