@@ -14,9 +14,14 @@ RUN apt-get update && \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy the requirements file and install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# --- CUSTOM DEPENDENCY INSTALLATION ---
+# Pinned installation to guarantee tool compatibility and avoid conflicts.
+# The `requests` and `python-dotenv` packages are still needed.
+RUN pip install --no-cache-dir \
+    streamlit \
+    google-generativeai==0.10.0 \
+    requests \
+    python-dotenv
 
 # Copy all application files (including main.py, .env, .streamlit/config.toml, etc.)
 # in one clean step to the workdir.
