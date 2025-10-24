@@ -18,11 +18,17 @@ RUN apt-get update && \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application files (including main.py and .streamlit/config.toml)
+# Explicitly copy the Streamlit configuration directory
+COPY .streamlit/ .streamlit/
+
+# Copy the rest of the application files (including main.py)
 COPY . .
 
 # Expose the port that Streamlit runs on (default 8501)
 EXPOSE 8501
+
+# Set the environment variable for the base URL path, crucial for running behind a proxy like Render
+ENV STREAMLIT_SERVER_BASE_URL_PATH="/"
 
 # Command to run the Streamlit app when the container starts
 # We use the port defined in config.toml
