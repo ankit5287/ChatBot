@@ -16,10 +16,10 @@ RUN apt-get update && \
 
 # --- CUSTOM DEPENDENCY INSTALLATION ---
 # Pinned installation to guarantee tool compatibility and avoid conflicts.
-# The `requests` and `python-dotenv` packages are still needed.
+# Using 0.8.0 as a highly stable fallback version for tool enabling.
 RUN pip install --no-cache-dir \
     streamlit \
-    google-generativeai==0.10.0 \
+    google-generativeai==0.8.0 \
     requests \
     python-dotenv
 
