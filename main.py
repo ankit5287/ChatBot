@@ -2,6 +2,8 @@ import os
 import streamlit as st
 from dotenv import load_dotenv
 import google.generativeai as genai
+# Import the specific tool configuration
+from google.generativeai.types import Tool
 
 # --- CONFIGURATION CONSTANTS ---
 
@@ -48,13 +50,15 @@ if not api_key:
 genai.configure(api_key=api_key)
 
 # Initialize the model with the Google Search tool enabled
-# THIS IS THE KEY FIX FOR REAL-TIME INFORMATION
+# FIX: Use the specific Tool.GOOGLE_SEARCH_TOOL object instead of the string "google_search"
 try:
     model = genai.GenerativeModel(
         MODEL_NAME,
-        tools=["google_search"] 
+        tools=[Tool.GOOGLE_SEARCH_TOOL] # <--- FIX APPLIED HERE
     )
 except ValueError as e:
+     # This part of the code is less likely to be reached with the fix, 
+     # but kept as a robust safeguard.
      st.error(f"Initialization Error: {e}. Please ensure your 'google-generativeai' library is version >= 0.5.0 in your requirements.txt.")
      st.stop()
 
