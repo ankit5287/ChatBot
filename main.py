@@ -2,8 +2,8 @@ import os
 import streamlit as st
 from dotenv import load_dotenv
 import google.generativeai as genai
-# RE-ADDING IMPORT: We must import the Tool object because the simple string list is failing.
-from google.generativeai.types import Tool 
+# REMOVING IMPORT: The Tool object import is causing an AttributeError in your environment.
+# from google.generativeai.types import Tool 
 
 # --- CONFIGURATION CONSTANTS ---
 
@@ -50,22 +50,19 @@ if not api_key:
     
 genai.configure(api_key=api_key)
 
-# Define the explicit Google Search tool function structure
-# This is the most robust way to define the tool when constants/strings fail.
-GOOGLE_SEARCH_TOOL_EXPLICIT = Tool.from_dict({
-    "google_search": {}
-})
-
+# Removed: GOOGLE_SEARCH_TOOL_EXPLICIT definition which caused the AttributeError.
 
 # Initialize the model with the Google Search tool enabled
-# FINAL FIX ATTEMPT: Using the explicit tool definition object.
+# FINAL ATTEMPT: Reverting to the simplest string list. This is the only remaining
+# possibility that might work with an older/incompatible environment setup.
 try:
     model = genai.GenerativeModel(
         MODEL_NAME,
-        tools=[GOOGLE_SEARCH_TOOL_EXPLICIT] 
+        tools=["google_search"] 
     )
 except Exception as e:
-     st.error(f"Initialization Error: {e}. I am unable to resolve the tool name. Please verify your SDK version in requirements.txt.")
+     # If this fails, the environment is fundamentally incompatible with the API call structure.
+     st.error(f"Initialization Error: {e}. I cannot resolve the tool name. Please check your SDK version in requirements.txt.")
      st.stop()
 
 
